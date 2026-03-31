@@ -3,752 +3,911 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easter Timeline: The 40 Days</title>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet Heatmap Plugin (for density visualization) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-heat/0.2.0/leaflet-heat.min.css" />
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <title>The Upper Room Chat</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { font-family: 'Inter', sans-serif; background: #fafafa; color: #2a2a2a; overflow-x: hidden; }
-
-        header {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white; padding: 1rem 2rem; text-align: center;
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f2f2f7; 
+            min-height: 100vh;
         }
-
-        header h1 { font-weight: 300; letter-spacing: 3px; margin-bottom: 0.5rem; }
-        header .subtitle { font-size: 0.85rem; opacity: 0.8; font-weight: 300; }
-
-        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
-
-        /* MAP CONTAINER WITH TOGGLE */
-        #map-wrapper { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 1rem; }
-        #map-container { height: 500px; }
-        #map { height: 100%; width: 100%; }
-
-        /* MAP TOGGLE BUTTONS */
-        .map-toggle { position: absolute; top: 10px; right: 10px; z-index: 1000; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-        .map-toggle button { padding: 0.5rem 1rem; border: none; background: transparent; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
-        .map-toggle button.active { background: #1a1a2e; color: white; }
-        .map-toggle button:hover:not(.active) { background: #f0f0f0; }
-
-        /* MAP LEGEND */
-        .map-legend { position: absolute; bottom: 15px; left: 15px; z-index: 1000; background: white; padding: 0.75rem 1rem; border-radius: 6px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); font-size: 0.75rem; max-height: 200px; overflow-y: auto; }
-        .legend-title { font-weight: 600; margin-bottom: 0.5rem; color: #1a1a2e; }
-        .location-item { display: flex; align-items: center; margin-bottom: 0.3rem; }
-        .location-dot { width: 8px; height: 8px; border-radius: 50%; background: #666; margin-right: 0.5rem; }
-
-        /* SLIDER SECTION */
-        .slider-section { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 1rem; }
-        .day-display { text-align: center; margin-bottom: 1rem; }
-        .day-number { font-size: 2rem; font-weight: 600; color: #1a1a2e; }
-        .day-title { color: #666; font-size: 1.1rem; }
-
-        input[type="range"] { width: 100%; height: 8px; border-radius: 4px; background: #e0e0e0; outline: none; -webkit-appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #1a1a2e; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
-
-        /* CHARACTER TOGGLES */
-        .characters-section { background: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 1rem; }
-        .character-chips { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
-
-        .chip { padding: 0.6rem 1.2rem; border-radius: 20px; border: 2px solid #ddd; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; user-select: none; }
-        .chip:hover { transform: translateY(-2px); }
-        .chip.active { border-color: #1a1a2e; background: #f0f4ff; }
-
-        /* GOSPEL COMPARISON PANEL (NEW!) */
-        .gospel-panel { background: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 1rem; }
-        .gospel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-        .gospel-title { font-weight: 600; color: #1a1a2e; }
         
-        .gospel-toggles { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-        .gospel-chip { padding: 0.4rem 0.8rem; border-radius: 15px; border: 2px solid #ddd; cursor: pointer; font-size: 0.8rem; transition: all 0.2s ease; background: white; }
-        .gospel-chip.active { opacity: 1; transform: scale(1.05); }
-        .gospel-chip.inactive { opacity: 0.4; }
+        .header {
+            background: white;
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .header h1 { font-size: 18px; color: #333; margin-bottom: 5px; }
+        .header .subtitle { font-size: 12px; color: #666; }
+        
+        .controls { 
+            padding: 10px 15px; 
+            background: white; 
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            background: #e5e5ea;
+            color: #333;
+        }
+        .controls button.active { background: #007aff; color: white; }
 
-        .gospel-chip[data-gospel="matthew"].active { border-color: #E74C3C; background: #FADBD8; }
-        .gospel-chip[data-gospel="mark"].active { border-color: #2980B9; background: #D6EAF8; }
-        .gospel-chip[data-gospel="luke"].active { border-color: #27AE60; background: #D5F5E3; }
-        .gospel-chip[data-gospel="john"].active { border-color: #9B59B6; background: #EBDEF0; }
-
-        .gospel-contents { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; display: grid; gap: 1rem; }
-        .gospel-card { padding: 0.75rem; border-radius: 6px; background: #f8f9fa; font-size: 0.85rem; }
-        .gospel-card h4 { margin-bottom: 0.3rem; font-weight: 600; font-size: 0.9rem; }
-
-        /* HEATMAP MODE TOGGLE (NEW!) */
-        .heatmap-section { background: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 1rem; }
-        .heatmap-toggle { display: flex; justify-content: center; align-items: center; gap: 1rem; }
-        .heatmap-label { font-weight: 600; color: #1a1a2e; }
-        .toggle-switch { position: relative; width: 50px; height: 26px; cursor: pointer; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #1a1a2e; }
-        input:checked + .slider:before { transform: translateX(24px); }
-
-        /* INFO PANEL */
-        .info-panel { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 1rem; }
-        .info-panel h3 { color: #1a1a2e; margin-bottom: 1rem; font-weight: 600; }
-
-        .verses-container { background: #f8f9fa; padding: 1.5rem; border-left: 4px solid #1a1a2e; margin-bottom: 1.5rem; font-style: italic; }
-        .verse { margin-bottom: 1rem; }
-        .verse:last-child { margin-bottom: 0; }
-        .verse-ref { font-weight: 600; color: #333; font-style: normal; }
-
-        .context-section { background: #fff8e1; padding: 1.5rem; border-radius: 6px; margin-top: 1rem; }
-        .context-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .context-title { color: #856404; font-weight: 600; }
-        .context-content { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd; }
-        .context-content.show { display: block; }
-        .context-item { margin-bottom: 0.75rem; font-size: 0.95rem; line-height: 1.6; }
-
-        /* FOOTER */
-        footer { text-align: center; padding: 2rem; color: #666; font-size: 0.85rem; }
-        .footer-note { margin-bottom: 0.5rem; }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            header h1 { font-size: 1.3rem; }
-            #map-container { height: 400px; }
-            .day-number { font-size: 1.5rem; }
-            .chip { padding: 0.5rem 1rem; font-size: 0.8rem; }
-            .map-legend { font-size: 0.7rem; max-height: 150px; }
+        .day-marker {
+            text-align: center;
+            padding: 20px 15px;
+            font-size: 14px;
+            color: #888;
+            background: #f2f2f7;
+            font-weight: 600;
         }
 
-        /* HEATMAP OVERLAY STYLES */
-        #heatmap-layer { position: absolute; top: 0; left: 0; width: 100%; height: 500px; pointer-events: none; z-index: 999; display: none; }
+        .context-box {
+            text-align: center;
+            padding: 15px 15px;
+            font-size: 13px;
+            color: #555;
+            background: #e8f4fd;
+            margin: 10px auto;
+            max-width: 600px;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        .pentecost-box {
+            text-align: center;
+            padding: 20px 15px;
+            font-size: 14px;
+            color: white;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            margin: 10px auto;
+            max-width: 600px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .chat-container { 
+            padding: 15px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+        
+        .message { 
+            display: flex; 
+            flex-direction: column; 
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.3s forwards;
+        }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        
+        .message.right { align-items: flex-end; }
+        .message.left { align-items: flex-start; }
+        
+        .bubble {
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .right .bubble { 
+            background: #007aff; 
+            color: white; 
+            border-bottom-right-radius: 8px;
+        }
+        .left .bubble { 
+            background: #e5e5ea; 
+            color: black; 
+            border-bottom-left-radius: 8px;
+        }
+        
+        .contact-name { font-size: 11px; color: #666; margin-bottom: 3px; padding-left: 5px; }
+        .right .contact-name { text-align: right; padding-right: 5px; padding-left: 0; }
+        
+        .timestamp { font-size: 10px; color: #999; margin-top: 4px; }
+        .message.right .timestamp { text-align: right; }
+        
+        .read-receipt { 
+            font-size: 11px; 
+            color: #888; 
+            padding-left: 5px; 
+            margin-top: -3px;
+        }
+        .message.right .read-receipt { text-align: right; padding-right: 5px; }
+
+        .char-peter { color: #d63031 !important; font-weight: 600; }
+        .char-john { color: #0984e3 !important; font-weight: 600; }
+        .char-marym { color: #6c5ce7 !important; font-weight: 600; }
+        .char-thomas { color: #e17055 !important; font-weight: 600; }
+        .char-mary { color: #a29bfe !important; font-weight: 600; }
+        .char-joseph { color: #00b894 !important; font-weight: 600; }
+        .char-cleopas { color: #fdcb6e !important; font-weight: 600; }
+
+        .scroll-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #007aff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+            z-index: 100;
+        }
+
+        @keyframes messagePop {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .message.pop .bubble {
+            animation: messagePop 0.2s ease-out;
+        }
+
+        @keyframes highlightFlash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(0, 122, 255, 0.3); }
+        }
+        
+        .message.flash .bubble {
+            animation: highlightFlash 0.4s ease-out;
+        }
+
+        .new-indicator {
+            background: #007aff;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .new-indicator.visible {
+            opacity: 1;
+        }
+
+        .bubble.emotional {
+            background: #ff6b6b !important;
+            color: white !important;
+        }
+
+        .bubble.holy-spirit {
+            background: linear-gradient(135deg, #007aff 0%, #a29bfe 100%) !important;
+            color: white !important;
+        }
+
+        /* Fire for Pentecost */
+        .bubble.pentecost-fire {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%) !important;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .typing-name {
+            font-size: 12px;
+            color: #666;
+            padding-left: 5px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>EASTER TIMELINE</h1>
-        <div class="subtitle">Following the Trails • Good Friday to Ascension (40 Days)</div>
-    </header>
-
-    <div class="container">
-        <!-- MAP WRAPPER WITH TOGGLE -->
-        <div id="map-wrapper">
-            <div id="map-container"><div id="map"></div></div>
-            
-            <!-- MAP TYPE TOGGLE -->
-            <div class="map-toggle">
-                <button id="btn-modern" class="active" onclick="switchMap('modern')">Modern</button>
-                <button id="btn-historical" onclick="switchMap('historical')">Historical (30 AD)</button>
-            </div>
-
-            <!-- MAP LEGEND -->
-            <div class="map-legend">
-                <div class="legend-title">📍 Key Locations</div>
-                <div class="location-item"><span class="location-dot" style="background:#D4AF37"></span>Golgotha (Crucifixion)</div>
-                <div class="location-item"><span class="location-dot" style="background:#8B4513"></span>Tomb of Jesus</div>
-                <div class="location-item"><span class="location-dot" style="background:#4A90D9"></span>Upper Room</div>
-                <div class="location-item"><span class="location-dot" style="background:#2ECC71"></span>Mount of Olives</div>
-                <div class="location-item"><span class="location-dot" style="background:#9B59B6"></span>Praetorium (Pilate)</div>
-                <div class="location-item"><span class="location-dot" style="background:#F39C12"></span>Road to Emmaus</div>
-            </div>
-
-            <!-- HEATMAP CANVAS -->
-            <canvas id="heatmap-layer"></canvas>
-        </div>
-
-        <!-- SLIDER -->
-        <div class="slider-section">
-            <div class="day-display">
-                <div class="day-number" id="current-day-num">Day 1</div>
-                <div class="day-title" id="current-day-title">Good Friday - Crucifixion & Burial</div>
-            </div>
-            <input type="range" id="timeline-slider" min="0" max="39" value="0" />
-        </div>
-
-        <!-- CHARACTER TOGGLES -->
-        <div class="characters-section">
-            <div class="character-chips" id="character-chips"></div>
-        </div>
-
-        <!-- GOSPEL COMPARISON PANEL (NEW!) -->
-        <div class="gospel-panel">
-            <div class="gospel-header">
-                <span class="gospel-title">📜 Gospel Comparison</span>
-                <div class="gospel-toggles" id="gospel-toggles"></div>
-            </div>
-            <div class="gospel-contents" id="gospel-contents"></div>
-        </div>
-
-        <!-- HEATMAP MODE TOGGLE (NEW!) -->
-        <div class="heatmap-section">
-            <div class="heatmap-toggle">
-                <span class="heatmap-label">🔥 Density Mode</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="heatmap-toggle" onchange="toggleHeatmap()" />
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <!-- INFO PANEL -->
-        <div class="info-panel">
-            <h3>📖 What Happened Today (NIV)</h3>
-            <div class="verses-container" id="verses-display"></div>
-
-            <div class="context-section">
-                <div class="context-header" onclick="toggleContext()">
-                    <span class="context-title">🏛️ Historical Context</span>
-                    <span id="context-toggle">▼ Click to expand</span>
-                </div>
-                <div class="context-content" id="context-display"></div>
-            </div>
-        </div>
+    <div class="header">
+        <h1>The Upper Room Chat</h1>
+        <div class="subtitle" id="participant-count">8 participants</div>
     </div>
 
-    <footer>
-        <p class="footer-note">Bible verses: New International Version (NIV) | Map data © OpenStreetMap contributors</p>
-        <p class="footer-note">Historical map layer based on archaeological reconstructions of Jerusalem c. 30 AD</p>
-    </footer>
+    <div class="controls">
+        <button onclick="setSpeed(1)" id="speed-1">Fast (4 min)</button>
+        <button onclick="setSpeed(2)" id="speed-2" class="active">Normal (10 min)</button>
+        <button onclick="setSpeed(3)" id="speed-3">Slow (20 min)</button>
+    </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <div class="chat-container" id="chat"></div>
+
+    <button class="scroll-btn" id="scroll-btn" onclick="scrollToBottom()">↓</button>
+
     <script>
-        // ============================================
-        // DATA: Characters (12 total)
-        // ============================================
+        const messages = [
+            // Day 1: Good Friday
+            { day: "Day 1 – Good Friday", time: 30 },
+            
+            { 
+                from: "Peter", 
+                text: "They took Him. Just... walked right up and took Him.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+            { 
+                from: "John", 
+                text: "I stayed close enough to hear the chief priests whispering. They're preparing a trial before dawn.", 
+                side: "left",
+                charClass: "char-john"
+            },
+            { 
+                from: "Mary (mother)", 
+                text: "Where is He? Let me see my son.", 
+                side: "left",
+                charClass: "char-mary",
+                emotional: true
+            },
 
-        const characters = [
-            { id: "jesus", name: "Jesus", color: "#D4AF37" },
-            { id: "mary_magdalene", name: "Mary Magdalene", color: "#E91E63" },
-            { id: "peter", name: "Peter", color: "#2196F3" },
-            { id: "john", name: "John", color: "#4CAF50" },
-            { id: "mary_mother", name: "Mary (mother)", color: "#9C27B0" },
-            { id: "joseph_arimathea", name: "Joseph of Arimathea", color: "#FF9800" },
-            { id: "nicodemus", name: "Nicodemus", color: "#607D8B" },
-            { id: "thomas", name: "Thomas", color: "#03A9F4" },
-            { id: "james", name: "James (brother)", color: "#8BC34A" },
-            { id: "cleopas", name: "Cleopas", color: "#FF5722" },
-            { id: "pilate", name: "Pontius Pilate", color: "#B71C1C" },
-            { id: "caiaphas", name: "Caiaphas (High Priest)", color: "#5D4037" }
+            { day: "", time: 45, note: "*He is led away to be crucified.*" },
+            
+            { 
+                from: "John", 
+                text: "They're taking Him to Golgotha. Now.", 
+                side: "left",
+                charClass: "char-john"
+            },
+
+            { day: "", time: 60, note: "*The crucifixion begins.*" },
+            
+            { 
+                from: "Mary Magdalene", 
+                text: "It's over. He's gone. Just... gone.", 
+                side: "left",
+                charClass: "char-marym",
+                emotional: true
+            },
+            { 
+                from: "Peter", 
+                text: "Three crosses. The middle one... I counted the hours. Three hours of darkness.", 
+                side: "left",
+                charClass: "char-peter",
+                read: true
+            },
+
+            // THE EARTHQUAKE MOMENT
+            { day: "", time: 62, note: "*The ground shook. Everyone felt it.*" },
+            
+            { 
+                from: "John", 
+                text: "Did you feel that? The earth... it moved.", 
+                side: "left",
+                charClass: "char-john"
+            },
+            { 
+                from: "Peter", 
+                text: "The temple veil tore. I saw it. Right down the middle.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // JESUS DIES
+            { day: "", time: 65, note: "*It is finished.*" },
+            
+            { 
+                from: "Mary (mother)", 
+                text: "My son. My firstborn...", 
+                side: "left",
+                charClass: "char-mary",
+                emotional: true
+            },
+
+            { day: "", time: 90 },
+            
+            { 
+                from: "Joseph of Arimathea", 
+                text: "I'm going to Pilate. I'll take the body.", 
+                side: "left",
+                charClass: "char-joseph"
+            },
+            { 
+                from: "Nicodemus", 
+                text: "I have spices. About seventy pounds. We won't let Him be forgotten.", 
+                side: "left",
+                charClass: "char-nicodemus"
+            },
+
+            { day: "", time: 120, note: "*Joseph and Nicodemus join the chat*" },
+            
+            { 
+                from: "Peter", 
+                text: "They put Him in a new tomb. A stone as big as a cart wheel rolled against it.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+            { 
+                from: "Mary Magdalene", 
+                text: "I'm watching. I won't leave.", 
+                side: "left",
+                charClass: "char-marym"
+            },
+
+            // Day 2: Holy Saturday (with context)
+            { day: "Day 2 – Holy Saturday", time: 150 },
+            
+            { 
+                from: "", 
+                text: "", 
+                side: "left",
+                context: true,
+                content: "The disciples hide in the upper room. The women prepare spices but can't buy more until Sunday (it's a Sabbath). Fear hangs heavy. They don't know what comes next."
+            },
+
+            { day: "", time: 155 },
+            
+            { 
+                from: "John", 
+                text: "We're safe for now. But how long?", 
+                side: "left",
+                charClass: "char-john"
+            },
+            { 
+                from: "Mary (mother)", 
+                text: "I keep thinking of Simeon's words... 'a sword will pierce your own soul too.'", 
+                side: "left",
+                charClass: "char-mary",
+                read: true
+            },
+
+            // Day 3: Easter Morning
+            { day: "Day 3 – Resurrection Sunday", time: 200 },
+
+            { 
+                from: "Mary Magdalene", 
+                text: "The stone. It's GONE.", 
+                side: "left",
+                charClass: "char-marym"
+            },
+            { 
+                from: "Peter", 
+                text: "What do you mean gone? Who moved it?", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THE ANGEL (Mary's perspective)
+            { 
+                from: "Mary Magdalene", 
+                text: "Two men... sitting where the body was. They asked why I'm crying.", 
+                side: "left",
+                charClass: "char-marym"
+            },
+
+            { 
+                from: "Mary Magdalene", 
+                text: "The tomb... it's EMPTY. They took Him! I don't know who!", 
+                side: "left",
+                charClass: "char-marym",
+                read: true,
+                emotional: true
+            },
+
+            { day: "", time: 210, note: "*Peter and John run to the tomb*" },
+
+            { 
+                from: "John", 
+                text: "I got there first. Barely caught my breath.", 
+                side: "left",
+                charClass: "char-john"
+            },
+            
+            { 
+                from: "Peter", 
+                text: "The linen cloths... just lying there. Like He shed them.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THE FACE CLOTH (John 20:7)
+            { 
+                from: "Peter", 
+                text: "And the face cloth... folded separately. Neat. Not thrown aside.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // BLOOD STAINS (visceral detail)
+            { 
+                from: "John", 
+                text: "I saw it too. The linen... still had the marks. The spices, the blood...", 
+                side: "left",
+                charClass: "char-john"
+            },
+
+            // THE MOMENT OF BELIEF
+            { 
+                from: "Peter", 
+                text: "This wasn't stolen. Thieves don't fold things.", 
+                side: "left",
+                charClass: "char-peter",
+                read: true,
+                emotional: true
+            },
+
+            // MARY SEES JESUS
+            { 
+                from: "Mary Magdalene", 
+                text: "They asked me why I'm crying. I said they took my Lord...", 
+                side: "left",
+                charClass: "char-marym"
+            },
+
+            { 
+                from: "Mary Magdalene", 
+                text: "He called my name. Just... 'Mary.' I know that voice.", 
+                side: "left",
+                charClass: "char-marym",
+                emotional: true
+            },
+
+            // Road to Emmaus (Full Story)
+            { day: "", time: 280, note: "*Later that evening*" },
+            
+            { 
+                from: "Cleopas", 
+                text: "We walked to Emmaus. You won't believe what happened.", 
+                side: "left",
+                charClass: "char-cleopas"
+            },
+            { 
+                from: "Mary (mother)", 
+                text: "Tell us. Please.", 
+                side: "left",
+                charClass: "char-mary",
+                read: true
+            },
+
+            // The Stranger joins them
+            { 
+                from: "Cleopas", 
+                text: "A stranger joined us on the road. We didn't know who He was.", 
+                side: "left",
+                charClass: "char-cleopas"
+            },
+
+            // Jesus explains Scripture
+            { 
+                from: "Cleopas", 
+                text: "He started with Moses. All the prophets... explaining everything about Himself.", 
+                side: "left",
+                charClass: "char-cleopas"
+            },
+
+            // They invite Him to stay
+            { 
+                from: "Cleopas", 
+                text: "We invited him to stay. Said 'the day is almost over.'", 
+                side: "left",
+                charClass: "char-cleopas"
+            },
+
+            // THE RECOGNITION MOMENT (Luke 24:30-31)
+            { 
+                from: "Cleopas", 
+                text: "He took bread. Gave thanks. Broke it and gave it to us.", 
+                side: "left",
+                charClass: "char-cleopas"
+            },
+
+            { 
+                from: "Mary Magdalene", 
+                text: "I saw Him too! He called my name!", 
+                side: "left",
+                charClass: "char-marym"
+            },
+
+            { 
+                from: "Cleopas", 
+                text: "Then our eyes opened. We KNEW Him. And suddenly... He was gone.", 
+                side: "left",
+                charClass: "char-cleopas",
+                emotional: true
+            },
+
+            // Easter Evening in the Upper Room
+            { day: "", time: 300, note: "*The disciples gathered in the upper room*" },
+
+            { 
+                from: "Peter", 
+                text: "We're all here. Doors locked.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THOMAS (skepticism + fear)
+            { 
+                from: "Thomas", 
+                text: "Unless I see the nail marks... unless I put my hand where He was pierced...", 
+                side: "right",
+                charClass: "char-thomas"
+            },
+
+            // JESUS APPEARS IN THE ROOM
+            { day: "", time: 320, note: "*He appears in the room. Doors still locked.*" },
+
+            { 
+                from: "John", 
+                text: "He's here. He just... appeared.", 
+                side: "left",
+                charClass: "char-john",
+                emotional: true
+            },
+
+            // Jesus shows wounds to Thomas (a week later - John 20:26)
+            { day: "", time: 325, note: "*A week passes. Thomas finally sees.*" },
+
+            { 
+                from: "Thomas", 
+                text: "My Lord... and my God.", 
+                side: "right",
+                charClass: "char-thomas",
+                emotional: true
+            },
+
+            // THE HOLY SPIRIT BREATH (John 20:22)
+            { day: "", time: 330, note: "*He breathes on them...*" },
+
+            { 
+                from: "Peter", 
+                text: "He breathed on us. Said 'Receive the Holy Spirit.'", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // PENTECOST SETUP (Acts 1:4-5)
+            { day: "", time: 340, note: "*He tells them to wait in Jerusalem.*" },
+
+            { 
+                from: "Peter", 
+                text: "What now? Do we wait? Do we go back to fishing?", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // ASCENSION DAY TEASER
+            { day: "", time: 350, note: "*Forty days later... He leads them out.*" },
+
+            { 
+                from: "Peter", 
+                text: "We're on the Mount of Olives. He's lifting His hands to bless us...", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THE ASCENSION (Acts 1:9)
+            { day: "", time: 360, note: "*And then...*" },
+
+            { 
+                from: "Peter", 
+                text: "He's going up. Into a cloud. We're watching...", 
+                side: "left",
+                charClass: "char-peter",
+                emotional: true
+            },
+
+            // ANGELS SPEAK (Acts 1:10-11)
+            { day: "", time: 365, note: "*Two men in white appear.*" },
+
+            { 
+                from: "John", 
+                text: "Men... angels? They said He'll return the same way.", 
+                side: "left",
+                charClass: "char-john"
+            },
+
+            // THE WAIT BEGINS (Pentecost is coming)
+            { day: "", time: 370, note: "*Now we wait. Ten days until Pentecost.*" },
+
+            { 
+                from: "Peter", 
+                text: "Back to the upper room. All of us. Waiting for power.", 
+                side: "left",
+                charClass: "char-peter",
+                read: true,
+                emotional: true
+            },
+
+            // Day 50: Pentecost!
+            { day: "Day 50 – The Day of Pentecost", time: 375 },
+            
+            { 
+                from: "", 
+                text: "", 
+                side: "left",
+                context: true,
+                content: "The disciples are gathered together when suddenly... a sound like wind fills the room. Tongues of fire rest on each of them."
+            },
+
+            // THE SOUND OF WIND (Acts 2:1-2)
+            { 
+                from: "Peter", 
+                text: "Did you hear that? Like... a violent wind! Filled the whole house!", 
+                side: "left",
+                charClass: "char-peter",
+                emotional: true,
+                pentecostFire: true
+            },
+
+            // FIRE (Acts 2:3)
+            { 
+                from: "John", 
+                text: "Look! Fire... above each of us. Like tongues.", 
+                side: "left",
+                charClass: "char-john",
+                emotional: true,
+                pentecostFire: true
+            },
+
+            // THEY SPEAK IN TONGUES (Acts 2:4)
+            { 
+                from: "Mary Magdalene", 
+                text: "I'm... I'm speaking. But not knowing what words to choose.", 
+                side: "left",
+                charClass: "char-marym",
+                emotional: true,
+                pentecostFire: true
+            },
+
+            // THE CROWD OUTSIDE (Acts 2:5-6)
+            { 
+                from: "John", 
+                text: "People are running in the streets. Everyone speaking different languages.", 
+                side: "left",
+                charClass: "char-john"
+            },
+
+            { 
+                from: "Peter", 
+                text: "They're confused! Jews from everywhere... Parthians, Medes, Elamites!", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THE MOCKERS (Acts 2:13)
+            { 
+                from: "Thomas", 
+                text: "Some say we're drunk. That it's only 9 in the morning.", 
+                side: "right",
+                charClass: "char-thomas"
+            },
+
+            // PETER STANDS UP (Acts 2:14)
+            { day: "", time: 380, note: "*Peter stands to speak.*" },
+
+            { 
+                from: "Peter", 
+                text: "Not drunk. Listen! Joel said this would happen... 'I will pour out my Spirit.'", 
+                side: "left",
+                charClass: "char-peter",
+                emotional: true,
+                pentecostFire: true
+            },
+
+            // THE GOSPEL (Acts 2:22-36)
+            { 
+                from: "Peter", 
+                text: "Jesus. You know Him. Crucified by lawless men... but God raised Him!", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            { 
+                from: "Peter", 
+                text: "He's not here now because He ascended! We're telling you the truth.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THE CROWD'S RESPONSE (Acts 2:37)
+            { day: "", time: 385, note: "*The crowd cuts to the heart.*" },
+
+            { 
+                from: "Peter", 
+                text: "They're asking... 'Brothers, what shall we do?'", 
+                side: "left",
+                charClass: "char-peter",
+                emotional: true
+            },
+
+            // THE CALL TO REPENTANCE (Acts 2:38)
+            { 
+                from: "Peter", 
+                text: "I told them... 'Repent. Be baptized. You'll receive the gift of the Holy Spirit.'", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            // THE RESULT (Acts 2:41)
+            { day: "", time: 390, note: "*The Word spread.*" },
+
+            { 
+                from: "Peter", 
+                text: "Three thousand. That's how many were added that day.", 
+                side: "left",
+                charClass: "char-peter",
+                read: true,
+                emotional: true,
+                pentecostFire: true
+            },
+
+            // THE NEW COMMUNITY (Acts 2:42-47)
+            { day: "", time: 395, note: "*And so it began...*" },
+
+            { 
+                from: "Peter", 
+                text: "We broke bread together. Shared everything. Prayed in the temple daily.", 
+                side: "left",
+                charClass: "char-peter"
+            },
+
+            { 
+                from: "John", 
+                text: "The Lord added to their number... day by day.", 
+                side: "left",
+                charClass: "char-john"
+            },
+
+            // THE END (but not really)
+            { day: "", time: 400, note: "*Good Friday → Resurrection → Ascension → Pentecost. The story continues.*" },
+
+            { 
+                from: "Peter", 
+                text: "This is what comes next. What will YOU do with it?", 
+                side: "left",
+                charClass: "char-peter",
+                read: true,
+                emotional: true
+            }
         ];
 
-        // ============================================
-        // LOCATIONS (All keys defined)
-        // ============================================
+        // State
+        let currentMsg = 0;
+        let speedMultiplier = 1;
+        let isPlaying = true;
+        const baseDelay = 8000;
 
-        const locations = {
-            golgotha: { lat: 31.7806, lng: 35.2298, name: "Golgotha" },
-            tomb: { lat: 31.7790, lng: 35.2305, name: "Tomb of Jesus" },
-            upper_room: { lat: 31.7740, lng: 35.2300, name: "Upper Room" },
-            mount_olives: { lat: 31.7800, lng: 35.2450, name: "Mount of Olives" },
-            praetorium: { lat: 31.7820, lng: 35.2270, name: "Pilate's Praetorium" },
-            road_to_emmaus: { lat: 31.8400, lng: 35.0000, name: "Road to Emmaus (~7 miles)" },
-            sea_of_galilee: { lat: 32.8100, lng: 35.5900, name: "Sea of Galilee" },
-            garden_gethsemane: { lat: 31.7785, lng: 35.2460, name: "Garden of Gethsemane" }
-        };
-
-        // ============================================
-        // GOSPEL DATA (NEW!) - Track which Gospel mentions each event
-        // ============================================
-
-        const gospelData = {
-            day1: {
-                matthew: [
-                    { ref: "Matthew 27:35-46", text: "They crucified him... 'My God, my God, why have you called me out of heaven for help?'" },
-                    { ref: "Matthew 27:57-60", text: "Joseph of Arimathea took the body and placed it in his own new tomb." }
-                ],
-                mark: [
-                    { ref: "Mark 15:24-37", text: "They divided his clothes... Jesus cried out in a loud voice and gave up his spirit." },
-                    { ref: "Mark 15:42-46", text: "Joseph of Arimathea... boldly went to Pilate and asked for Jesus' body." }
-                ],
-                luke: [
-                    { ref: "Luke 23:33-46", text: "At the place called The Skull, they crucified him... 'Father, into your hands I commit my spirit.'" },
-                    { ref: "Luke 23:50-53", text: "Joseph of Arimathea, a member of the council... took the body down and wrapped it in linen." }
-                ],
-                john: [
-                    { ref: "John 19:17-30", text: "Carrying his own cross, he went out to Golgotha... 'It is finished.' He bowed his head and gave up his spirit." },
-                    { ref: "John 19:38-42", text: "Joseph of Arimathea... Nicodemus brought a mixture of myrrh and aloes. They took the body of Jesus and wrapped it with spices in linen strips." }
-                ]
-            },
-            day3: {
-                matthew: [
-                    { ref: "Matthew 28:1-10", text: "After the Sabbath, at dawn on the first day of the week... 'He is not here; he has risen!'" }
-                ],
-                mark: [
-                    { ref: "Mark 16:1-8", text: "Very early on the first day of the week... 'Why do you look for the living among the dead? He has risen!'" }
-                ],
-                luke: [
-                    { ref: "Luke 24:1-12", text: "On the first day of the week, very early in the morning... 'He is not here; he has risen!'" },
-                    { ref: "Luke 24:13-35", text: "That same day two disciples were going to Emmaus... He was made known to them in the breaking of the bread." }
-                ],
-                john: [
-                    { ref: "John 20:1-18", text: "Early on the first day of the week, while it was still dark, Mary Magdalene went to the tomb... 'I have seen the Lord!'" }
-                ]
-            },
-            day5: {
-                matthew: null, // Not recorded in Matthew
-                mark: null,
-                luke: [
-                    { ref: "Luke 24:36-43", text: "'Peace be with you.' They were startled... 'Why are you troubled? Look at my hands and feet.'" }
-                ],
-                john: [
-                    { ref: "John 20:19-23", text: "On the evening of that first day, Jesus came and stood among them... 'Peace be with you!'" }
-                ]
-            },
-            default: {
-                matthew: [{ ref: "Matthew 28:16-20", text: "The eleven disciples went to Galilee, to the mountain where Jesus had told them to go." }],
-                mark: null,
-                luke: [{ ref: "Luke 24:35-49", text: "'He appeared to Simon,' and then to the two as they were on their way... 'Preach for repentance and forgiveness of sins.'" }],
-                john: [{ ref: "John 20:19-31", text: "Jesus came and stood among them... 'Peace be with you!'" }]
-            }
-        };
-
-        // ============================================
-        // TIMELINE DATA (Fixed + Expanded)
-        // ============================================
-
-        const timeline = [
-            {
-                day: 1, title: "Good Friday - Crucifixion & Burial", gospelDay: "day1",
-                verses: [{ ref: "John 19:17-30", text: "Carrying his own cross... 'It is finished.'" }],
-                context: ["Roman crucifixion was public execution reserved for slaves and rebels.", "Jewish law required burial before sundown (Deut 21:23)."],
-                positions: {
-                    jesus: [locations.garden_gethsemane, locations.praetorium, locations.golgotha, locations.tomb],
-                    mary_magdalene: [locations.golgotha],
-                    peter: [locations.praetorium],
-                    john: [locations.garden_gethsemane, locations.golgotha],
-                    mary_mother: [locations.golgotha],
-                    joseph_arimathea: [locations.praetorium, locations.tomb],
-                    nicodemus: [locations.tomb],
-                    pilate: [locations.praetorium],
-                    caiaphas: [locations.praetorium]
-                }
-            },
-            {
-                day: 2, title: "Holy Saturday - The Silent Day", gospelDay: null,
-                verses: [{ ref: "Matthew 27:62-66", text: "Next day... chief priests asked Pilate for a guard to seal the tomb." }],
-                context: ["The Sabbath (Saturday) was observed strictly; no work permitted.", "Roman guards were placed to prevent body theft."],
-                positions: { jesus: [locations.tomb], mary_magdalene: [locations.upper_room], peter: [locations.upper_room] }
-            },
-            {
-                day: 3, title: "Resurrection Sunday - Empty Tomb & First Appearances", gospelDay: "day3",
-                verses: [{ ref: "John 20:1-18", text: "'He has risen!' Mary Magdalene went to the tomb... 'I have seen the Lord!'" }],
-                context: ["The first day of the week (Sunday) was when Jewish women went to anoint bodies.", "Emmaus was approximately 7 miles west of Jerusalem."],
-                positions: { jesus: [locations.tomb, locations.road_to_emmaus], mary_magdalene: [locations.tomb], peter: [locations.tomb, locations.upper_room] }
-            },
-            {
-                day: 5, title: "Day 5 - Appearance to Disciples (Thomas absent)", gospelDay: "day5",
-                verses: [{ ref: "John 20:19-23", text: "'Peace be with you.' Jesus came and stood among them." }],
-                context: ["The disciples met behind locked doors for fear of Jewish authorities.", "Jesus showed his wounds as proof of bodily resurrection."],
-                positions: { jesus: [locations.upper_room], mary_magdalene: [locations.upper_room], peter: [locations.upper_room] }
-            },
-            {
-                day: 7, title: "Day 7 - 'Doubting' Thomas Believes", gospelDay: null,
-                verses: [{ ref: "John 20:24-29", text: "'Unless I see the nail marks...' Jesus appeared and invited him to touch." }],
-                context: ["One week had passed since the first appearance.", "Jesus blessed those who believe without seeing."],
-                positions: { jesus: [locations.upper_room], thomas: [locations.upper_room] }
-            },
-            {
-                day: 15, title: "Day 15 - By the Sea of Galilee", gospelDay: null,
-                verses: [{ ref: "John 21:1-14", text: "'Friends, haven't you any fish?' He told them to cast net on right side." }],
-                context: ["Disciples had returned to fishing (their former trade).", "Peter made a three-fold declaration of love, restoring him after his denial."],
-                positions: { jesus: [locations.sea_of_galilee], peter: [locations.sea_of_galilee] }
-            },
-            {
-                day: 25, title: "Day 25 - Return to Jerusalem", gospelDay: null,
-                verses: [{ ref: "Acts 1:3-4", text: "'He appeared to them over a period of forty days and spoke about the kingdom of God.'" }],
-                context: ["Jesus prepared disciples for His departure by teaching them about the Kingdom.", "The disciples gathered in Jerusalem awaiting the promise of the Father."],
-                positions: { jesus: [locations.upper_room], peter: [locations.upper_room] }
-            },
-            {
-                day: 35, title: "Day 35 - Final Teachings", gospelDay: null,
-                verses: [{ ref: "John 14-17", text: "'I will not leave you as orphans; I will come to you.'" }],
-                context: ["Jesus promised the coming of the Holy Spirit (the Advocate).", "The Upper Room Discourse prepared them for His physical departure."],
-                positions: { jesus: [locations.upper_room, locations.garden_gethsemane] }
-            },
-            {
-                day: 40, title: "Day 40 - The Ascension", gospelDay: null,
-                verses: [{ ref: "Luke 24:50-51", text: "'He was taken up into heaven.'" }, { ref: "Acts 1:9-11", text: "'He will come back in the same way.'"}],
-                context: ["Bethany is on the eastern slope of the Mount of Olives.", "The 40-day period fulfills Acts 1:3.", "Two men in white (angels) promised Jesus' return."],
-                positions: { jesus: [locations.upper_room, locations.mount_olives] }
-            }
-        ];
-
-        // Fill in missing days for smooth slider
-        for (let i = 0; i < timeline.length - 1; i++) {
-            const currentDay = timeline[i];
-            const nextDay = timeline[i + 1];
-            const daysBetween = nextDay.day - currentDay.day;
-            
-            if (daysBetween > 1) {
-                for (let j = 1; j < daysBetween; j++) {
-                    let interpolatedPositions = JSON.parse(JSON.stringify(currentDay.positions));
-                    
-                    if (currentDay.day >= 25) {
-                        const defaultJerusalem = {
-                            jesus: [locations.upper_room],
-                            mary_magdalene: [locations.upper_room],
-                            peter: [locations.upper_room]
-                        };
-                        interpolatedPositions = defaultJerusalem;
-                    }
-
-                    timeline.splice(i + j, 0, {
-                        day: currentDay.day + j,
-                        title: `Day ${currentDay.day + j}`,
-                        gospelDay: null,
-                        verses: [{ ref: "Acts 1:3", text: "Jesus appeared to them over a period of forty days..." }],
-                        context: ["A period of teaching and appearances before the Ascension."],
-                        positions: interpolatedPositions
-                    });
-                }
-            }
+        function setSpeed(level) {
+            speedMultiplier = level;
+            document.querySelectorAll('.controls button').forEach((btn, i) => {
+                btn.classList.toggle('active', i + 1 === level);
+            });
         }
 
-        // ============================================
-        // MAP INITIALIZATION
-        // ============================================
+        function scrollToBottom() {
+            const chat = document.getElementById('chat');
+            chat.scrollTop = chat.scrollHeight;
+        }
 
-        const map = L.map('map').setView([31.78, 35.23], 14);
-
-        const modernTiles = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            minZoom: 10, maxZoom: 19, attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        const historicalTiles = new L.TileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            minZoom: 10, maxZoom: 19, attribution: '© OpenStreetMap, © CartoDB'
-        });
-
-        let currentMapType = 'modern';
-
-        function switchMap(type) {
-            if (type === 'historical') {
-                modernTiles.removeFrom(map);
-                historicalTiles.addTo(map);
-                document.getElementById('btn-historical').classList.add('active');
-                document.getElementById('btn-modern').classList.remove('active');
+        function showScrollButton() {
+            const chat = document.getElementById('chat');
+            const scrollBtn = document.getElementById('scroll-btn');
+            if (chat.scrollTop + chat.clientHeight < chat.scrollHeight - 100) {
+                scrollBtn.style.display = 'block';
             } else {
-                historicalTiles.removeFrom(map);
-                modernTiles.addTo(map);
-                document.getElementById('btn-modern').classList.add('active');
-                document.getElementById('btn-historical').classList.remove('active');
+                scrollBtn.style.display = 'none';
             }
-            currentMapType = type;
         }
 
-        // ============================================
-        // HEATMAP LOGIC (NEW!)
-        // ============================================
+        function showNewIndicator() {
+            const indicator = document.getElementById('new-indicator');
+            if (indicator) {
+                indicator.classList.add('visible');
+                
+                setTimeout(() => {
+                    indicator.classList.remove('visible');
+                }, 1500);
+            }
+        }
 
-        let heatmapActive = false;
-        const heatmapCanvas = document.getElementById('heatmap-layer');
-
-        function calculateHeatmapData() {
-            const heatPoints = {};
+        function addMessage(msg, index) {
+            const chat = document.getElementById('chat');
             
-            // Count how many times each location was visited across all timeline days
-            for (const day of timeline) {
-                for (const charId in day.positions) {
-                    const positions = day.positions[charId];
-                    for (const pos of positions) {
-                        const key = `${pos.lat.toFixed(4)},${pos.lng.toFixed(4)}`;
-                        if (!heatPoints[key]) heatPoints[key] = 0;
-                        heatPoints[key]++;
-                    }
+            if (msg.day && msg.time > 0) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day-marker';
+                dayDiv.textContent = msg.day;
+                chat.appendChild(dayDiv);
+            }
+
+            // Context box for Holy Saturday & Pentecost
+            if (msg.context === true) {
+                let className = 'context-box';
+                if (msg.day && msg.day.includes('Pentecost')) {
+                    className += ' pentecost-box';
                 }
+                
+                const contextDiv = document.createElement('div');
+                contextDiv.className = className;
+                contextDiv.innerHTML = `<em>${msg.content}</em>`;
+                chat.appendChild(contextDiv);
             }
 
-            return Object.entries(heatPoints).map(([key, intensity]) => {
-                const [lat, lng] = key.split(',').map(Number);
-                return [lat, lng, intensity]; // [lat, lng, value] for heatmap
-            });
-        }
-
-        function drawHeatmap() {
-            if (!heatmapActive) {
-                heatmapCanvas.style.display = 'none';
-                return;
+            if (msg.note && !msg.from) {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'day-marker';
+                noteDiv.innerHTML = `<em>${msg.note}</em>`;
+                chat.appendChild(noteDiv);
             }
 
-            const heatPoints = calculateHeatmapData();
-            const ctx = heatmapCanvas.getContext('2d');
-            
-            // Get map dimensions
-            const bounds = map.getBounds();
-            const topLeft = map.latLngToContainerPoint(bounds.getNorthWest());
-            const bottomRight = map.latLngToContainerPoint(bounds.getSouthEast());
-            
-            const width = Math.abs(bottomRight.x - topLeft.x);
-            const height = Math.abs(bottomRight.y - topLeft.y);
-
-            heatmapCanvas.width = width;
-            heatmapCanvas.height = height;
-            heatmapCanvas.style.display = 'block';
-            
-            // Simple gradient-based density visualization
-            ctx.clearRect(0, 0, width, height);
-            
-            heatPoints.forEach(([lat, lng, intensity]) => {
-                const point = map.latLngToContainerPoint([lat, lng]);
-                const radius = Math.min(30, 15 + intensity * 2);
-                const alpha = Math.min(0.6, 0.2 + intensity * 0.08);
+            if (msg.from && msg.text) {
+                showNewIndicator();
                 
-                // Create gradient
-                const gradient = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, radius);
-                gradient.addColorStop(0, `rgba(255, 100, 50, ${alpha})`);
-                gradient.addColorStop(0.5, `rgba(255, 150, 50, ${alpha * 0.6})`);
-                gradient.addColorStop(1, `rgba(255, 200, 50, 0)`);
-
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-                ctx.fillStyle = gradient;
-                ctx.fill();
-            });
-        }
-
-        function toggleHeatmap() {
-            heatmapActive = document.getElementById('heatmap-toggle').checked;
-            drawHeatmap();
-        }
-
-        // ============================================
-        // GOSPEL COMPARISON UI (NEW!)
-        // ============================================
-
-        let selectedGospels = ['matthew', 'mark', 'luke', 'john'];
-
-        function initGospelToggles() {
-            const container = document.getElementById('gospel-toggles');
-            const gospels = [
-                { id: 'matthew', color: '#E74C3C', name: 'Matthew' },
-                { id: 'mark', color: '#2980B9', name: 'Mark' },
-                { id: 'luke', color: '#27AE60', name: 'Luke' },
-                { id: 'john', color: '#9B59B6', name: 'John' }
-            ];
-
-            gospels.forEach(g => {
-                const chip = document.createElement('div');
-                chip.className = 'gospel-chip active';
-                chip.dataset.gospel = g.id;
-                chip.innerHTML = `<span style="color:${g.color}">●</span> ${g.name}`;
-                
-                chip.addEventListener('click', () => {
-                    chip.classList.toggle('active');
-                    const idx = selectedGospels.indexOf(g.id);
-                    if (idx > -1) {
-                        selectedGospels.splice(idx, 1);
-                    } else {
-                        selectedGospels.push(g.id);
-                    }
+                setTimeout(() => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${msg.side} pop flash`;
                     
-                    // Ensure at least one Gospel is always shown
-                    if (selectedGospels.length === 0) {
-                        chip.classList.add('active');
-                        selectedGospels = [g.id];
-                    }
+                    const charClass = msg.charClass || 'char-peter';
+                    const emotionalClass = msg.emotional ? 'emotional' : '';
+                    const pentecostClass = (msg.pentecostFire) ? 'pentecost-fire' : '';
                     
-                    updateGospelContents();
-                });
-                
-                container.appendChild(chip);
-            });
-        }
-
-        function updateGospelContents() {
-            const container = document.getElementById('gospel-contents');
-            const currentDayData = timeline[currentDayIndex];
-            const gospelKey = currentDayData.gospelDay;
-            
-            if (!gospelKey || !gospelData[gospelKey]) {
-                container.innerHTML = '<p style="color:#666; font-style:italic;">Gospel details not recorded for this day. See Acts 1:3 for summary of appearances.</p>';
-                return;
+                    msgDiv.innerHTML = `
+                        <div class="contact-name"><span class="${charClass}">${msg.from}</span></div>
+                        <div class="bubble ${emotionalClass} ${pentecostClass}">${msg.text}</div>
+                        ${msg.read ? '<div class="read-receipt">Read</div>' : ''}
+                        <div class="timestamp">${formatTime(msg.time)}</div>
+                    `;
+                    
+                    chat.appendChild(msgDiv);
+                    scrollToBottom();
+                }, 100);
             }
 
-            const gospelDayData = gospelData[gospelKey];
-            let html = '';
-
-            selectedGospels.forEach(gospel => {
-                if (gospelDayData[gospel]) {
-                    gospelDayData[gospel].forEach(verse => {
-                        html += `
-                            <div class="gospel-card">
-                                <h4 style="color:${getGospelColor(gospel)}">${gospel.charAt(0).toUpperCase() + gospel.slice(1)}</h4>
-                                <p><strong>${verse.ref}</strong>: ${verse.text}</p>
-                            </div>
-                        `;
-                    });
-                } else {
-                    html += `<div class="gospel-card"><em style="color:#999">${gospel.charAt(0).toUpperCase() + gospel.slice(1)}: Not recorded</em></div>`;
-                }
-            });
-
-            container.innerHTML = html;
-        }
-
-        function getGospelColor(gospel) {
-            const colors = { matthew: '#E74C3C', mark: '#2980B9', luke: '#27AE60', john: '#9B59B6' };
-            return colors[gospel];
-        }
-
-        // ============================================
-        // MARKER TRACKING SYSTEM
-        // ============================================
-
-        let activeLayers = {};
-        let currentDayIndex = 0;
-
-        function createMarker(character, latLng) {
-            const options = character.id === 'jesus' ? 
-                { radius: 12, color: '#D4AF37', fillColor: '#D4AF37', fillOpacity: 1, weight: 3 } :
-                { radius: 6, color: character.color, fillColor: character.color, fillOpacity: 0.9 };
-
-            return L.circleMarker([latLng.lat, latLng.lng], options);
-        }
-
-        function updateMapForDay(dayIndex) {
-            for (const layer in activeLayers) { map.removeLayer(activeLayers[layer]); }
-            activeLayers = {};
-
-            const dayData = timeline[dayIndex];
-            currentDayIndex = dayIndex;
-
-            document.getElementById('current-day-num').textContent = `Day ${dayData.day}`;
-            document.getElementById('current-day-title').textContent = dayData.title;
-            
-            const versesHTML = dayData.verses.map(v => 
-                `<div class="verse"><span class="verse-ref">${v.ref}</span> "${v.text}"</div>`
-            ).join('');
-            document.getElementById('verses-display').innerHTML = versesHTML;
-
-            const contextHTML = dayData.context.map(c => 
-                `<div class="context-item">• ${c}</div>`
-            ).join('');
-            document.getElementById('context-display').innerHTML = contextHTML;
-
-            // Update Gospel comparison panel when day changes
-            updateGospelContents();
-
-            let activeCharacterIds = Array.from(document.querySelectorAll('.chip.active')).map(chip => chip.dataset.id);
-
-            if (activeCharacterIds.length === 0) {
-                const jesusChip = document.querySelector('[data-id="jesus"]');
-                jesusChip.classList.add('active');
-                activeCharacterIds = ['jesus'];
-            }
-
-            const bounds = L.latLngBounds();
-            let hasMarkers = false;
-
-            for (const charId of activeCharacterIds) {
-                const character = characters.find(c => c.id === charId);
-                if (!character || !dayData.positions[charId]) continue;
-
-                const positions = dayData.positions[charId];
-                const lastPos = positions[positions.length - 1];
+            if (currentMsg + 1 < messages.length) {
+                let delay = baseDelay / speedMultiplier;
+                delay = delay * (0.7 + Math.random() * 0.5);
                 
-                const marker = createMarker(character, lastPos).addTo(map);
-                activeLayers[`${charId}-marker`] = marker;
-                
-                bounds.extend([lastPos.lat, lastPos.lng]);
-                hasMarkers = true;
-
-                if (positions.length > 1) {
-                    const pathCoords = positions.map(p => [p.lat, p.lng]);
-                    const polyline = L.polyline(pathCoords, { 
-                        color: character.color, weight: 3, opacity: 0.7, dashArray: '5, 10' 
-                    }).addTo(map);
-                    activeLayers[`${charId}-path`] = polyline;
-                    
-                    pathCoords.forEach(coord => bounds.extend(coord));
-
-                    const startPos = positions[0];
-                    if (start0 !== lastPos) {
-                        const startMarker = L.circleMarker([startPos.lat, startPos.lng], {
-                            radius: 4, color: character.color, fillOpacity: 0.5
-                        }).addTo(map);
-                        activeLayers[`${charId}-start`] = startMarker;
-                    }
-                }
-            }
-
-            if (hasMarkers) {
-                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
-            }
-
-            // Redraw heatmap if active
-            drawHeatmap();
-        }
-
-        // ============================================
-        // CHARACTER CHIP INITIALIZATION
-        // ============================================
-
-        function initCharacterChips() {
-            const container = document.getElementById('character-chips');
-            
-            characters.forEach(char => {
-                const chip = document.createElement('div');
-                chip.className = 'chip';
-                chip.dataset.id = char.id;
-                
-                chip.innerHTML = `<span style="color:${char.color}">●</span> ${char.name}`;
-                
-                chip.addEventListener('click', () => {
-                    chip.classList.toggle('active');
-                    
-                    if (document.querySelectorAll('.chip.active').length === 0) {
-                        document.querySelector('[data-id="jesus"]').classList.add('active');
-                    }
-                    
-                    updateMapForDay(currentDayIndex);
-                });
-
-                container.appendChild(chip);
-            });
-
-            // Activate Jesus + Mary Magdalene by default
-            document.querySelector('[data-id="jesus"]').classList.add('active');
-            document.querySelector('[data-id="mary_magdalene"]').classList.add('active');
-        }
-
-        // ============================================
-        // UI FUNCTIONS
-        // ============================================
-
-        function toggleContext() {
-            const content = document.getElementById('context-display');
-            const toggle = document.getElementById('context-toggle');
-            
-            if (content.classList.contains('show')) {
-                content.classList.remove('show');
-                toggle.textContent = '▼ Click to expand';
+                setTimeout(() => {
+                    currentMsg++;
+                    play();
+                }, delay);
             } else {
-                content.classList.add('show');
-                toggle.textContent = '▲ Click to collapse';
+                isPlaying = false;
+                const endDiv = document.createElement('div');
+                endDiv.className = 'day-marker';
+                endDiv.innerHTML = `<em style="color: #007aff">The story continues...</em>`;
+                chat.appendChild(endDiv);
             }
         }
 
-        // Slider event listener
-        const slider = document.getElementById('timeline-slider');
-        slider.addEventListener('input', () => {
-            updateMapForDay(parseInt(slider.value));
-        });
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            let h = hours % 12 || 12;
+            return `${h}:${mins.toString().padStart(2, '0')} ${ampm}`;
+        }
 
-        // ============================================
-        // INITIALIZATION
-        // ============================================
+        function play() {
+            if (!isPlaying) return;
+            
+            const msg = messages[currentMsg];
+            addMessage(msg, currentMsg);
+        }
 
-        initCharacterChips();
-        initGospelToggles();
-        updateMapForDay(0);
-
-        setTimeout(() => { map.setView([31.78, 35.23], 14); }, 300);
-
-        // Redraw heatmap on map zoom/pan
-        map.on('zoomend', drawHeatmap);
-        map.on('moveend', drawHeatmap);
+        window.onload = () => {
+            setTimeout(play, 1000);
+            
+            const chat = document.getElementById('chat');
+            chat.addEventListener('scroll', showScrollButton);
+            showScrollButton();
+        };
     </script>
 </body>
 </html>
